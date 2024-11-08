@@ -21,6 +21,7 @@ jobs:
       id: secretdata
       uses: hashicorp/vault-action@v2.4.0
       with:
+        jwt: ${{ steps.auth_token.outputs.id_token }}
         method: jwt
         url: http://52.62.143.122:8200
         role: default
