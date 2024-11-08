@@ -17,16 +17,14 @@ jobs:
       run: |
         echo $(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=gha-medium" | base64)
       shell: bash
-    - name: Retreive Secrets
-      id: retrieve-secrets
-      uses: hashicorp/vault-action@v2.4.1
+    - name: Retrieve secret from Vault
+      id: secretdata
+      uses: hashicorp/vault-action@v2.4.0
       with:
-        url: ${{ env.hashiUrl }}
-        role: ${{ env.roleName }}
         method: jwt
-        jwtGithubAudience: ${{ env.audience }}
-        namespace: ${{ env.namespace }}
-        tlsSkipVerify: false
-        exportEnv: true
-        secrets: |
-          secret/data/apikeys deploymentServer | DEPLOYMENT_KEY
+        url: http://52.62.143.122:8200
+        role: default
+        secrets: kv/data/secrets/mygithubproject/secret1 secretvalue |  MY_SECRET
+    - name: Use secret from Vault
+      run: |
+          echo '${{ steps.secretdata.outputs.MY_SECRET }}
