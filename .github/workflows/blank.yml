@@ -13,3 +13,20 @@ jobs:
     steps:
     - name: Say it
       run: echo "Hello World"
+    - name: perform token run
+      run: |
+        echo $(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=gha-medium" | base64)
+      shell: bash
+    - name: Retreive Secrets
+      id: retrieve-secrets
+      uses: hashicorp/vault-action@v2.4.1
+      with:
+        url: ${{ env.hashiUrl }}
+        role: ${{ env.roleName }}
+        method: jwt
+        jwtGithubAudience: ${{ env.audience }}
+        namespace: ${{ env.namespace }}
+        tlsSkipVerify: false
+        exportEnv: true
+        secrets: |
+          secret/data/apikeys deploymentServer | DEPLOYMENT_KEY
